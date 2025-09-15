@@ -13,6 +13,11 @@ def index():
     genres = sorted(list(set(g for q in quizzes.values() for g in q)))
     return render_template('index.html', years=years, genres=genres)
 
+# クイズページ
+@app.route('/quiz')
+def quiz():
+    return render_template('quiz.html')
+
 # クイズデータ取得API
 @app.route('/api/quiz', methods=['POST'])
 def get_quiz():
