@@ -1,10 +1,10 @@
 // script.js
 
 // グローバル変数
-let quizzes = []; // 取得した問題データを格納
-let currentQuizIndex = 0; // 現在の問題番号
-let correctAnswers = 0; // 正解数
-let totalQuizzes = 0; // 全問題数
+let quizzes = [];
+let currentQuizIndex = 0;
+let correctAnswers = 0;
+let totalQuizzes = 0;
 
 // DOM要素
 const startButton = document.getElementById('start-button');
@@ -12,9 +12,7 @@ const yearSelect = document.getElementById('year-select');
 const genreSelect = document.getElementById('genre-select');
 const quizQuestionNumber = document.getElementById('quiz-question-number');
 const quizQuestion = document.getElementById('quiz-question');
-const correctButton = document.getElementById('correct-button');
-const incorrectButton = document.getElementById('incorrect-button');
-const quizButtons = document.getElementById('quiz-buttons');
+const quizButtons = document.getElementById('quiz-buttons'); // ボタンを生成するコンテナ
 const quizResult = document.getElementById('quiz-result');
 const quizCommentary = document.getElementById('quiz-commentary');
 const nextButton = document.getElementById('next-button');
@@ -25,12 +23,6 @@ const backToHomeButton = document.getElementById('back-to-home-button');
 // イベントリスナー
 if (startButton) {
     startButton.addEventListener('click', startQuiz);
-}
-if (correctButton) {
-    correctButton.addEventListener('click', () => checkAnswer('〇'));
-}
-if (incorrectButton) {
-    incorrectButton.addEventListener('click', () => checkAnswer('×'));
 }
 if (nextButton) {
     nextButton.addEventListener('click', nextQuiz);
@@ -46,7 +38,6 @@ async function startQuiz() {
     const year = yearSelect.value;
     const genre = genreSelect.value;
     
-    // APIを呼び出して問題データを取得
     try {
         const response = await fetch('/api/quiz', {
             method: 'POST',
@@ -68,7 +59,10 @@ async function startQuiz() {
             currentQuizIndex = 0;
             correctAnswers = 0;
 
-            // クイズページへリダイレクト
+            sessionStorage.setItem('quizzes', JSON.stringify(quizzes));
+            sessionStorage.setItem('currentQuizIndex', currentQuizIndex);
+            sessionStorage.setItem('correctAnswers', correctAnswers);
+
             window.location.href = `/quiz?year=${year}&genre=${genre}`;
         } else {
             alert(data.error);
@@ -81,42 +75,12 @@ async function startQuiz() {
 
 // クイズページでの初期化
 if (window.location.pathname === '/quiz') {
-    window.onload = async () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const year = urlParams.get('year');
-        const genre = urlParams.get('genre');
-        
-        try {
-            const response = await fetch('/api/quiz', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ year: year, genre: genre })
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                quizzes = data;
-                if (quizzes.length === 0) {
-                    alert('選択した条件の問題が見つかりませんでした。トップページに戻ります。');
-                    window.location.href = '/';
-                    return;
-                }
-                totalQuizzes = quizzes.length;
-                currentQuizIndex = 0;
-                correctAnswers = 0;
-                displayQuiz();
-            } else {
-                alert(data.error);
-                window.location.href = '/';
-            }
-        } catch (error) {
-            console.error('API呼び出しエラー:', error);
-            alert('問題データの取得に失敗しました。トップページに戻ります。');
-            window.location.href = '/';
-        }
+    window.onload = () => {
+        quizzes = JSON.parse(sessionStorage.getItem('quizzes'));
+        currentQuizIndex = parseInt(sessionStorage.getItem('currentQuizIndex'));
+        correctAnswers = parseInt(sessionStorage.getItem('correctAnswers'));
+        totalQuizzes = quizzes.length;
+        displayQuiz();
     };
 }
 
@@ -127,10 +91,19 @@ function displayQuiz() {
         quizQuestionNumber.textContent = `第${currentQuizIndex + 1}問 / ${totalQuizzes}問`;
         quizQuestion.textContent = quiz.question;
         
-        quizButtons.classList.remove('hidden');
+        // ボタンを動的に生成
+        quizButtons.innerHTML = '';
+        const options = ['①', '②', '③', '④'];
+        options.forEach(option => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.classList.add('quiz-button');
+            button.addEventListener('click', () => checkAnswer(option));
+            quizButtons.appendChild(button);
+        });
+
         quizResult.classList.add('hidden');
     } else {
-        // クイズ終了
         finishQuiz();
     }
 }
@@ -146,13 +119,16 @@ function checkAnswer(userAnswer) {
         quizCommentary.innerHTML = `残念！正解は「${currentQuiz.answer}」です。<br><br>${currentQuiz.commentary}`;
     }
 
-    quizButtons.classList.add('hidden');
+    // ボタンを非表示に
+    quizButtons.innerHTML = '';
     quizResult.classList.remove('hidden');
 }
 
 // 次の問題へ
 function nextQuiz() {
     currentQuizIndex++;
+    sessionStorage.setItem('currentQuizIndex', currentQuizIndex);
+    sessionStorage.setItem('correctAnswers', correctAnswers);
     displayQuiz();
 }
 
@@ -163,4 +139,6 @@ function finishQuiz() {
     
     document.getElementById('quiz-container').classList.add('hidden');
     quizCompletion.classList.remove('hidden');
+
+    sessionStorage.clear(); // セッションストレージをクリア
 }
