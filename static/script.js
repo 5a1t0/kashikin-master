@@ -12,7 +12,7 @@ const yearSelect = document.getElementById('year-select');
 const genreSelect = document.getElementById('genre-select');
 const quizQuestionNumber = document.getElementById('quiz-question-number');
 const quizQuestion = document.getElementById('quiz-question');
-const quizButtons = document.getElementById('quiz-buttons'); // ボタンを生成するコンテナ
+const quizButtons = document.getElementById('quiz-buttons');
 const quizResult = document.getElementById('quiz-result');
 const quizCommentary = document.getElementById('quiz-commentary');
 const nextButton = document.getElementById('next-button');
@@ -89,7 +89,9 @@ function displayQuiz() {
     if (currentQuizIndex < totalQuizzes) {
         const quiz = quizzes[currentQuizIndex];
         quizQuestionNumber.textContent = `第${currentQuizIndex + 1}問 / ${totalQuizzes}問`;
-        quizQuestion.textContent = quiz.question;
+        
+        // 問題文をHTMLとして表示
+        quizQuestion.innerHTML = quiz.question;
         
         // ボタンを動的に生成
         quizButtons.innerHTML = '';
@@ -114,12 +116,13 @@ function checkAnswer(userAnswer) {
     
     if (userAnswer === currentQuiz.answer) {
         correctAnswers++;
+        // 解説文をHTMLとして表示
         quizCommentary.innerHTML = `正解！<br><br>${currentQuiz.commentary}`;
     } else {
+        // 解説文をHTMLとして表示
         quizCommentary.innerHTML = `残念！正解は「${currentQuiz.answer}」です。<br><br>${currentQuiz.commentary}`;
     }
 
-    // ボタンを非表示に
     quizButtons.innerHTML = '';
     quizResult.classList.remove('hidden');
 }
@@ -140,5 +143,5 @@ function finishQuiz() {
     document.getElementById('quiz-container').classList.add('hidden');
     quizCompletion.classList.remove('hidden');
 
-    sessionStorage.clear(); // セッションストレージをクリア
+    sessionStorage.clear();
 }
