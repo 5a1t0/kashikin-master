@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>かしきんマスター - クイズ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>かしきんマスター</h1>
+    </header>
+
+    <main class="container">
+        <div id="quiz-container">
+            <div id="quiz-question-number"></div>
+            <div id="quiz-question"></div>
+            <div id="quiz-buttons">
+                <button id="correct-button" class="quiz-button">〇</button>
+                <button id="incorrect-button" class="quiz-button">×</button>
+            </div>
+            <div id="quiz-result" class="hidden">
+                <div id="quiz-commentary"></div>
+                <button id="next-button" class="quiz-button">次の問題へ</button>
+            </div>
+        </div>
+        <div id="quiz-completion" class="hidden">
+            <h2>クイズ終了！</h2>
+            <p>お疲れ様でした！</p>
+            <p id="accuracy-rate"></p>
+            <button id="back-to-home-button" class="quiz-button">トップに戻る</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 かしきんマスター</p>
+    </footer>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

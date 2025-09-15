@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>かしきんマスター - トップ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>かしきんマスター</h1>
+        <p>貸金業務取扱主任者試験 過去問 一問一答</p>
+    </header>
+
+    <main class="container">
+        <h2>問題選択</h2>
+        <div class="selection-container">
+            <div class="selection-group">
+                <label for="year-select">年度:</label>
+                <select id="year-select">
+                    {% for year in years %}
+                    <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="selection-group">
+                <label for="genre-select">ジャンル:</label>
+                <select id="genre-select">
+                    {% for genre in genres %}
+                    <option value="{{ genre }}">{{ genre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button id="start-button">スタート</button>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 かしきんマスター</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
