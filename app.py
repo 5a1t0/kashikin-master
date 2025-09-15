@@ -1,9 +1,14 @@
 # app.py
 
 from flask import Flask, render_template, request, jsonify
-from data import quizzes  # 問題データをインポート
+from data import quizzes
 
 app = Flask(__name__)
+
+# 改行コードをHTMLの<br>タグに変換するフィルタ
+@app.template_filter('nl2br')
+def nl2br(s):
+    return s.replace('\n', '<br>')
 
 # トップページ
 @app.route('/')
@@ -29,7 +34,12 @@ def get_quiz():
     selected_quizzes = []
     if year and year in quizzes:
         if genre and genre in quizzes[year]:
-            selected_quizzes = quizzes[year][genre]
+            # 問題文と解説文の改行をHTMLの<br>タグに変換
+            for q in quizzes[year][genre]:
+                q_copy = q.copy()
+                q_copy['question'] = q_copy['question'].replace('\n', '<br>')
+                q_copy['commentary'] = q_copy['commentary'].replace('\n', '<br>')
+                selected_quizzes.append(q_copy)
     
     if not selected_quizzes:
         return jsonify({"error": "指定された条件に一致する問題が見つかりません。"})
