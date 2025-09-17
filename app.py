@@ -1,7 +1,5 @@
-# app.py
-
 from flask import Flask, render_template, request, jsonify
-from data import quizzes
+import sqlite3
 
 app = Flask(__name__)
 
@@ -10,12 +8,23 @@ app = Flask(__name__)
 def nl2br(s):
     return s.replace('\n', '<br>')
 
+def get_db_connection():
+    """SQLiteデータベースに接続する"""
+    conn = sqlite3.connect('kashikin.db')
+    conn.row_factory = sqlite3.Row  # 辞書形式で結果を取得
+    return conn
+
 # トップページ
 @app.route('/')
 def index():
-    # 年度とジャンルのリストを取得
-    years = sorted(list(quizzes.keys()))
-    genres = sorted(list(set(g for q in quizzes.values() for g in q)))
+    conn = get_db_connection()
+    years = conn.execute("SELECT DISTINCT year FROM questions ORDER BY year DESC").fetchall()
+    genres = conn.execute("SELECT DISTINCT genre FROM questions ORDER BY genre ASC").fetchall()
+    conn.close()
+
+    years = [row['year'] for row in years]
+    genres = [row['genre'] for row in genres]
+    
     return render_template('index.html', years=years, genres=genres)
 
 # クイズページ
@@ -30,16 +39,17 @@ def get_quiz():
     year = data.get('year')
     genre = data.get('genre')
 
-    # 年度とジャンルに基づいて問題を抽出
+    conn = get_db_connection()
+    questions = conn.execute("SELECT * FROM questions WHERE year = ? AND genre = ?", (year, genre)).fetchall()
+    conn.close()
+
     selected_quizzes = []
-    if year and year in quizzes:
-        if genre and genre in quizzes[year]:
-            # 問題文と解説文の改行をHTMLの<br>タグに変換
-            for q in quizzes[year][genre]:
-                q_copy = q.copy()
-                q_copy['question'] = q_copy['question'].replace('\n', '<br>')
-                q_copy['commentary'] = q_copy['commentary'].replace('\n', '<br>')
-                selected_quizzes.append(q_copy)
+    if questions:
+        for q in questions:
+            q_dict = dict(q)
+            q_dict['question'] = q_dict['question'].replace('\n', '<br>')
+            q_dict['commentary'] = q_dict['commentary'].replace('\n', '<br>')
+            selected_quizzes.append(q_dict)
     
     if not selected_quizzes:
         return jsonify({"error": "指定された条件に一致する問題が見つかりません。"})
@@ -47,4 +57,7 @@ def get_quiz():
     return jsonify(selected_quizzes)
 
 if __name__ == '__main__':
+    # アプリケーション起動時にデータベースをセットアップ
+    from db_setup import setup_database
+    setup_database()
     app.run(host='0.0.0.0', port=5000)
