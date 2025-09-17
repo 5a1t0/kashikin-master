@@ -21,6 +21,7 @@ const quizCompletion = document.getElementById('quiz-completion');
 const accuracyRate = document.getElementById('accuracy-rate');
 const backToHomeButton = document.getElementById('back-to-home-button');
 const quizAccuracyRate = document.getElementById('quiz-accuracy-rate');
+const progressBar = document.getElementById('progress-bar'); // 追加
 
 // イベントリスナー
 if (startButton) {
@@ -94,8 +95,8 @@ function displayQuiz() {
     if (currentQuizIndex < totalQuizzes) {
         const quiz = quizzes[currentQuizIndex];
         
-        // 正答率の更新
         updateAccuracyRate();
+        updateProgressBar();
         
         quizQuestionNumber.textContent = `第${currentQuizIndex + 1}問 / ${totalQuizzes}問`;
         quizQuestion.innerHTML = quiz.question;
@@ -127,14 +128,21 @@ function updateAccuracyRate() {
     }
 }
 
+// プログレスバーを更新する関数
+function updateProgressBar() {
+    const progress = (currentQuizIndex / totalQuizzes) * 100;
+    progressBar.style.width = `${progress}%`;
+    progressBar.textContent = `${Math.floor(progress)}%`;
+}
+
+
 // 解答判定
 function checkAnswer(userAnswer, clickedButton) {
     const currentQuiz = quizzes[currentQuizIndex];
     
-    // 全てのボタンを無効化
     Array.from(quizButtons.children).forEach(button => {
         button.disabled = true;
-        // 正解・不正解に応じて色を変更
+        
         if (button.textContent === currentQuiz.answer) {
             button.classList.add('correct');
         } else if (button.textContent === userAnswer) {
@@ -146,10 +154,16 @@ function checkAnswer(userAnswer, clickedButton) {
         correctAnswers++;
         quizCommentary.innerHTML = `正解！<br><br>${currentQuiz.commentary}`;
     } else {
-        quizCommentary.innerHTML = `残念！正解は「${currentQuiz.answer}」です。<br><br>${currentQuiz.commentary}`;
+        const commentary = currentQuiz.commentary.replace(new RegExp(`(正解は「${currentQuiz.answer}」です)`, 'g'), `<span class="correct-highlight">$1</span>`);
+        quizCommentary.innerHTML = `残念！<br><br>${commentary}`;
+        
+        // 不正解の選択肢も強調
+        const incorrectCommentary = quizCommentary.innerHTML.replace(new RegExp(`(残念！)`, 'g'), `<span class="incorrect-highlight">$1</span>`);
+        quizCommentary.innerHTML = incorrectCommentary;
     }
     
     updateAccuracyRate();
+    updateProgressBar();
 
     quizResult.classList.remove('hidden');
 }
