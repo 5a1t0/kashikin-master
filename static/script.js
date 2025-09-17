@@ -16,11 +16,11 @@ const quizButtons = document.getElementById('quiz-buttons');
 const quizResult = document.getElementById('quiz-result');
 const quizCommentary = document.getElementById('quiz-commentary');
 const nextButton = document.getElementById('next-button');
-const endButton = document.getElementById('end-button'); // 追加
+const endButton = document.getElementById('end-button');
 const quizCompletion = document.getElementById('quiz-completion');
 const accuracyRate = document.getElementById('accuracy-rate');
 const backToHomeButton = document.getElementById('back-to-home-button');
-const quizAccuracyRate = document.getElementById('quiz-accuracy-rate'); // 追加
+const quizAccuracyRate = document.getElementById('quiz-accuracy-rate');
 
 // イベントリスナー
 if (startButton) {
@@ -29,7 +29,7 @@ if (startButton) {
 if (nextButton) {
     nextButton.addEventListener('click', nextQuiz);
 }
-if (endButton) { // 追加
+if (endButton) {
     endButton.addEventListener('click', finishQuiz);
 }
 if (backToHomeButton) {
@@ -106,7 +106,7 @@ function displayQuiz() {
             const button = document.createElement('button');
             button.textContent = option;
             button.classList.add('quiz-button');
-            button.addEventListener('click', () => checkAnswer(option));
+            button.addEventListener('click', () => checkAnswer(option, button));
             quizButtons.appendChild(button);
         });
 
@@ -118,18 +118,30 @@ function displayQuiz() {
 
 // 正答率を更新する関数
 function updateAccuracyRate() {
-    if (currentQuizIndex > 0) {
-        const accuracy = (correctAnswers / currentQuizIndex) * 100;
-        quizAccuracyRate.textContent = `正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${currentQuizIndex}問)`;
+    const answeredCount = currentQuizIndex;
+    if (answeredCount > 0) {
+        const accuracy = (correctAnswers / answeredCount) * 100;
+        quizAccuracyRate.textContent = `正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${answeredCount}問)`;
     } else {
-        quizAccuracyRate.textContent = `正答率: - % (0/${currentQuizIndex}問)`;
+        quizAccuracyRate.textContent = `正答率: - % (0/0問)`;
     }
 }
 
 // 解答判定
-function checkAnswer(userAnswer) {
+function checkAnswer(userAnswer, clickedButton) {
     const currentQuiz = quizzes[currentQuizIndex];
     
+    // 全てのボタンを無効化
+    Array.from(quizButtons.children).forEach(button => {
+        button.disabled = true;
+        // 正解・不正解に応じて色を変更
+        if (button.textContent === currentQuiz.answer) {
+            button.classList.add('correct');
+        } else if (button.textContent === userAnswer) {
+            button.classList.add('incorrect');
+        }
+    });
+
     if (userAnswer === currentQuiz.answer) {
         correctAnswers++;
         quizCommentary.innerHTML = `正解！<br><br>${currentQuiz.commentary}`;
@@ -137,10 +149,8 @@ function checkAnswer(userAnswer) {
         quizCommentary.innerHTML = `残念！正解は「${currentQuiz.answer}」です。<br><br>${currentQuiz.commentary}`;
     }
     
-    // 解答後の正答率を更新
     updateAccuracyRate();
 
-    quizButtons.innerHTML = '';
     quizResult.classList.remove('hidden');
 }
 
