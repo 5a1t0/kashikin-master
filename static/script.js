@@ -16,9 +16,11 @@ const quizButtons = document.getElementById('quiz-buttons');
 const quizResult = document.getElementById('quiz-result');
 const quizCommentary = document.getElementById('quiz-commentary');
 const nextButton = document.getElementById('next-button');
+const endButton = document.getElementById('end-button'); // 追加
 const quizCompletion = document.getElementById('quiz-completion');
 const accuracyRate = document.getElementById('accuracy-rate');
 const backToHomeButton = document.getElementById('back-to-home-button');
+const quizAccuracyRate = document.getElementById('quiz-accuracy-rate'); // 追加
 
 // イベントリスナー
 if (startButton) {
@@ -26,6 +28,9 @@ if (startButton) {
 }
 if (nextButton) {
     nextButton.addEventListener('click', nextQuiz);
+}
+if (endButton) { // 追加
+    endButton.addEventListener('click', finishQuiz);
 }
 if (backToHomeButton) {
     backToHomeButton.addEventListener('click', () => {
@@ -88,12 +93,13 @@ if (window.location.pathname === '/quiz') {
 function displayQuiz() {
     if (currentQuizIndex < totalQuizzes) {
         const quiz = quizzes[currentQuizIndex];
-        quizQuestionNumber.textContent = `第${currentQuizIndex + 1}問 / ${totalQuizzes}問`;
         
-        // 問題文をHTMLとして表示
+        // 正答率の更新
+        updateAccuracyRate();
+        
+        quizQuestionNumber.textContent = `第${currentQuizIndex + 1}問 / ${totalQuizzes}問`;
         quizQuestion.innerHTML = quiz.question;
         
-        // ボタンを動的に生成
         quizButtons.innerHTML = '';
         const options = ['①', '②', '③', '④'];
         options.forEach(option => {
@@ -110,18 +116,29 @@ function displayQuiz() {
     }
 }
 
+// 正答率を更新する関数
+function updateAccuracyRate() {
+    if (currentQuizIndex > 0) {
+        const accuracy = (correctAnswers / currentQuizIndex) * 100;
+        quizAccuracyRate.textContent = `正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${currentQuizIndex}問)`;
+    } else {
+        quizAccuracyRate.textContent = `正答率: - % (0/${currentQuizIndex}問)`;
+    }
+}
+
 // 解答判定
 function checkAnswer(userAnswer) {
     const currentQuiz = quizzes[currentQuizIndex];
     
     if (userAnswer === currentQuiz.answer) {
         correctAnswers++;
-        // 解説文をHTMLとして表示
         quizCommentary.innerHTML = `正解！<br><br>${currentQuiz.commentary}`;
     } else {
-        // 解説文をHTMLとして表示
         quizCommentary.innerHTML = `残念！正解は「${currentQuiz.answer}」です。<br><br>${currentQuiz.commentary}`;
     }
+    
+    // 解答後の正答率を更新
+    updateAccuracyRate();
 
     quizButtons.innerHTML = '';
     quizResult.classList.remove('hidden');

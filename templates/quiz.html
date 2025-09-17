@@ -13,13 +13,19 @@
 
     <main class="container">
         <div id="quiz-container">
+            <div id="quiz-status">
+                <span id="quiz-accuracy-rate"></span>
+            </div>
             <div id="quiz-question-number"></div>
             <div id="quiz-question"></div>
             <div id="quiz-buttons">
                 </div>
             <div id="quiz-result" class="hidden">
                 <div id="quiz-commentary"></div>
-                <button id="next-button" class="quiz-button">次の問題へ</button>
+                <div id="navigation-buttons">
+                    <button id="next-button" class="quiz-button">次の問題へ</button>
+                    <button id="end-button" class="quiz-button">終了</button>
+                </div>
             </div>
         </div>
         <div id="quiz-completion" class="hidden">

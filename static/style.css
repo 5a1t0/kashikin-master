@@ -95,6 +95,12 @@ button#start-button:hover {
 }
 
 /* クイズページ */
+#quiz-status {
+    text-align: left;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
 #quiz-question-number {
     font-size: 1.2rem;
     font-weight: bold;
@@ -103,46 +109,35 @@ button#start-button:hover {
 }
 
 #quiz-question {
-    font-size: 1.5rem;
+    font-size: 1.2rem; /* フォントサイズを調整 */
     margin-bottom: 30px;
     font-weight: bold;
-    min-height: 100px; /* 問題文が短い場合でもレイアウトが崩れないように */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    min-height: 100px;
+    text-align: left; /* 左揃えに変更 */
 }
 
 #quiz-buttons {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; /* 左揃えに変更 */
     gap: 20px;
+    flex-wrap: wrap;
     margin-bottom: 20px;
 }
 
 .quiz-button {
     padding: 15px 40px;
     font-size: 1.5rem;
-    color: #fff;
-    border: none;
+    color: #000; /* 文字色を黒に変更 */
+    background-color: #ecf0f1;
+    border: 1px solid #bdc3c7;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-#correct-button {
-    background-color: #2ecc71;
-}
-
-#correct-button:hover {
-    background-color: #27ae60;
-}
-
-#incorrect-button {
-    background-color: #e74c3c;
-}
-
-#incorrect-button:hover {
-    background-color: #c0392b;
+.quiz-button:hover {
+    background-color: #34495e;
+    color: #fff;
 }
 
 #quiz-result {
@@ -157,14 +152,25 @@ button#start-button:hover {
     border-radius: 5px;
 }
 
-#next-button, #back-to-home-button {
+#navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+#next-button, #back-to-home-button, #end-button {
     background-color: #3498db;
     font-size: 1.2rem;
     padding: 10px 20px;
-    margin-top: 10px;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-#next-button:hover, #back-to-home-button:hover {
+#next-button:hover, #back-to-home-button:hover, #end-button:hover {
     background-color: #2980b9;
 }
 
@@ -193,16 +199,27 @@ button#start-button:hover {
     }
 
     #quiz-question {
-        font-size: 1.2rem;
+        font-size: 1rem;
     }
 
     #quiz-buttons {
-        flex-direction: column;
+        justify-content: center;
+        flex-direction: row;
     }
-    
+
     .quiz-button {
-        width: 100%;
+        width: 48%; /* 2列で表示 */
         padding: 12px 0;
         font-size: 1.2rem;
+    }
+
+    #navigation-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #next-button, #end-button {
+        width: 100%;
+        margin-top: 10px;
     }
 }
