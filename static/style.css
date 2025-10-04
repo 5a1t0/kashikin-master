@@ -1,6 +1,6 @@
-/* style.css */
+/* style.css - 整理済み */
 
-/* 全体設定 */
+/* === 1. 基本設定 (Base & Layout) === */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f9;
@@ -49,7 +49,11 @@ footer {
     margin-top: auto;
 }
 
-/* トップページ */
+.hidden {
+    display: none;
+}
+
+/* === 2. トップページ (Index Page) === */
 .selection-container {
     display: flex;
     flex-direction: column;
@@ -94,7 +98,7 @@ button#start-button:hover {
     background-color: #2980b9;
 }
 
-/* クイズページ */
+/* === 3. クイズ画面 (Quiz Page) === */
 #quiz-status {
     text-align: left;
     margin-bottom: 20px;
@@ -108,17 +112,42 @@ button#start-button:hover {
     margin-bottom: 10px;
 }
 
+/* 問題文 (フォントサイズ調整と左揃え) */
 #quiz-question {
-    font-size: 1.2rem; /* フォントサイズを調整 */
+    font-size: 1.2rem;
     margin-bottom: 30px;
     font-weight: bold;
     min-height: 100px;
-    text-align: left; /* 左揃えに変更 */
+    text-align: left;
 }
 
+/* --- プログレスバー --- */
+#progress-bar-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+#progress-bar {
+    height: 20px;
+    background-color: #3498db;
+    width: 0;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+/* --- 解答ボタン --- */
 #quiz-buttons {
     display: flex;
-    justify-content: flex-start; /* 左揃えに変更 */
+    justify-content: flex-start; /* 左揃え */
     gap: 20px;
     flex-wrap: wrap;
     margin-bottom: 20px;
@@ -127,7 +156,7 @@ button#start-button:hover {
 .quiz-button {
     padding: 15px 40px;
     font-size: 1.5rem;
-    color: #000; /* 文字色を黒に変更 */
+    color: #000; /* 文字色を黒に */
     background-color: #ecf0f1;
     border: 1px solid #bdc3c7;
     border-radius: 5px;
@@ -140,18 +169,41 @@ button#start-button:hover {
     color: #fff;
 }
 
+/* --- 解答後の結果表示 --- */
 #quiz-result {
     text-align: left;
 }
 
+/* 解説ボックスの基本スタイル */
 #quiz-commentary {
     background-color: #ecf0f1;
-    border-left: 5px solid #3498db;
+    border-left: 5px solid #3498db; /* デフォルトの青色 */
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 5px;
 }
 
+/* 解説ボックスの枠線色（視覚フィードバック） */
+#quiz-result.correct-box #quiz-commentary {
+    border-left: 5px solid #2ecc71; /* 正解時は緑色 */
+}
+
+#quiz-result.incorrect-box #quiz-commentary {
+    border-left: 5px solid #e74c3c; /* 不正解時は赤色 */
+}
+
+/* 解説文の強調表示 */
+#quiz-commentary .correct-highlight {
+    font-weight: bold;
+    color: #2ecc71;
+}
+
+#quiz-commentary .incorrect-highlight {
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+/* --- ナビゲーションボタン --- */
 #navigation-buttons {
     display: flex;
     justify-content: space-between;
@@ -179,11 +231,7 @@ button#start-button:hover {
     font-weight: bold;
 }
 
-.hidden {
-    display: none;
-}
-
-/* レスポンシブデザイン */
+/* --- 4. レスポンシブデザイン --- */
 @media (max-width: 600px) {
     .container {
         margin: 10px;
@@ -208,7 +256,7 @@ button#start-button:hover {
     }
 
     .quiz-button {
-        width: 48%; /* 2列で表示 */
+        width: 48%;
         padding: 12px 0;
         font-size: 1.2rem;
     }
@@ -222,52 +270,4 @@ button#start-button:hover {
         width: 100%;
         margin-top: 10px;
     }
-}
-
-/* 新しいボタンの色 */
-.quiz-button.correct {
-    background-color: #2ecc71; /* 正解時の色 */
-    color: #fff;
-    border: 1px solid #27ae60;
-}
-
-.quiz-button.incorrect {
-    background-color: #e74c3c; /* 不正解時の色 */
-    color: #fff;
-    border: 1px solid #c0392b;
-}
-
-/* プログレスバーのコンテナ */
-#progress-bar-container {
-    width: 100%;
-    background-color: #e0e0e0;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    overflow: hidden;
-}
-
-/* プログレスバー本体 */
-#progress-bar {
-    height: 20px;
-    background-color: #3498db;
-    width: 0;
-    border-radius: 10px;
-    transition: width 0.5s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: bold;
-    font-size: 0.8rem;
-}
-
-/* 解説文の強調表示 */
-#quiz-commentary .correct-highlight {
-    font-weight: bold;
-    color: #2ecc71; /* 正解時の色 */
-}
-
-#quiz-commentary .incorrect-highlight {
-    font-weight: bold;
-    color: #e74c3c; /* 不正解時の色 */
 }

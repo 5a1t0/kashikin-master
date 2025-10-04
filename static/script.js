@@ -21,7 +21,7 @@ const quizCompletion = document.getElementById('quiz-completion');
 const accuracyRate = document.getElementById('accuracy-rate');
 const backToHomeButton = document.getElementById('back-to-home-button');
 const quizAccuracyRate = document.getElementById('quiz-accuracy-rate');
-const progressBar = document.getElementById('progress-bar'); // 追加
+const progressBar = document.getElementById('progress-bar');
 
 // イベントリスナー
 if (startButton) {
@@ -95,8 +95,9 @@ function displayQuiz() {
     if (currentQuizIndex < totalQuizzes) {
         const quiz = quizzes[currentQuizIndex];
         
+        // 問題文と進捗バーの更新
         updateAccuracyRate();
-        updateProgressBar();
+        updateProgressBar(currentQuizIndex, totalQuizzes);
         
         quizQuestionNumber.textContent = `第${currentQuizIndex + 1}問 / ${totalQuizzes}問`;
         quizQuestion.innerHTML = quiz.question;
@@ -107,11 +108,13 @@ function displayQuiz() {
             const button = document.createElement('button');
             button.textContent = option;
             button.classList.add('quiz-button');
+            // クリック時にボタン自体を渡す
             button.addEventListener('click', () => checkAnswer(option, button));
             quizButtons.appendChild(button);
         });
 
         quizResult.classList.add('hidden');
+        quizResult.classList.remove('correct-box', 'incorrect-box'); // 前回の枠線をリセット
     } else {
         finishQuiz();
     }
@@ -119,7 +122,8 @@ function displayQuiz() {
 
 // 正答率を更新する関数
 function updateAccuracyRate() {
-    const answeredCount = currentQuizIndex;
+    // 回答済みの問題数を分母に使用
+    const answeredCount = currentQuizIndex; 
     if (answeredCount > 0) {
         const accuracy = (correctAnswers / answeredCount) * 100;
         quizAccuracyRate.textContent = `正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${answeredCount}問)`;
@@ -129,8 +133,8 @@ function updateAccuracyRate() {
 }
 
 // プログレスバーを更新する関数
-function updateProgressBar() {
-    const progress = (currentQuizIndex / totalQuizzes) * 100;
+function updateProgressBar(currentIndex, totalCount) {
+    const progress = (currentIndex / totalCount) * 100;
     progressBar.style.width = `${progress}%`;
     progressBar.textContent = `${Math.floor(progress)}%`;
 }
@@ -139,32 +143,45 @@ function updateProgressBar() {
 // 解答判定
 function checkAnswer(userAnswer, clickedButton) {
     const currentQuiz = quizzes[currentQuizIndex];
-    
+    let isCorrect = (userAnswer === currentQuiz.answer);
+
+    // 全てのボタンを無効化し、色を変更
     Array.from(quizButtons.children).forEach(button => {
         button.disabled = true;
         
         if (button.textContent === currentQuiz.answer) {
+            // 正解ボタンを緑色に
             button.classList.add('correct');
         } else if (button.textContent === userAnswer) {
+            // 不正解のボタンを赤色に
             button.classList.add('incorrect');
         }
     });
 
-    if (userAnswer === currentQuiz.answer) {
+    // 正答率の更新
+    if (isCorrect) {
         correctAnswers++;
-        quizCommentary.innerHTML = `正解！<br><br>${currentQuiz.commentary}`;
+        quizResult.classList.add('correct-box');
+        quizCommentary.innerHTML = `<span class="correct-highlight">正解！</span><br><br>${currentQuiz.commentary}`;
     } else {
-        const commentary = currentQuiz.commentary.replace(new RegExp(`(正解は「${currentQuiz.answer}」です)`, 'g'), `<span class="correct-highlight">$1</span>`);
-        quizCommentary.innerHTML = `残念！<br><br>${commentary}`;
+        quizResult.classList.add('incorrect-box');
         
-        // 不正解の選択肢も強調
-        const incorrectCommentary = quizCommentary.innerHTML.replace(new RegExp(`(残念！)`, 'g'), `<span class="incorrect-highlight">$1</span>`);
-        quizCommentary.innerHTML = incorrectCommentary;
+        // 解説文を強調表示
+        let commentaryHTML = currentQuiz.commentary;
+        
+        // 1. 正解の選択肢を強調
+        commentaryHTML = commentaryHTML.replace(new RegExp(`(${currentQuiz.answer}:)`, 'g'), `<span class="correct-highlight">$1</span>`);
+        
+        // 2. 不正解（ユーザーが選んだ選択肢）を強調
+        commentaryHTML = commentaryHTML.replace(new RegExp(`(${userAnswer}:)`, 'g'), `<span class="incorrect-highlight">$1</span>`);
+
+        quizCommentary.innerHTML = `<span class="incorrect-highlight">残念！</span> 正解は${currentQuiz.answer}です。<br><br>${commentaryHTML}`;
     }
     
-    updateAccuracyRate();
-    updateProgressBar();
-
+    // updateAccuracyRate() は checkAnswer の先頭で呼び出されているため、ここでは不要。
+    // ※ただし、正解数を反映させるため、finishQuiz関数や updateAccuracyRate 関数を調整しています。
+    updateAccuracyRate(); 
+    
     quizResult.classList.remove('hidden');
 }
 
@@ -178,8 +195,10 @@ function nextQuiz() {
 
 // クイズ終了
 function finishQuiz() {
+    const answeredCount = currentQuizIndex + (quizResult.classList.contains('hidden') ? 0 : 1); // 現在の問題が回答済みなら+1
+    
     const accuracy = (correctAnswers / totalQuizzes) * 100;
-    accuracyRate.textContent = `正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${totalQuizzes}問)`;
+    accuracyRate.textContent = `最終正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${totalQuizzes}問)`;
     
     document.getElementById('quiz-container').classList.add('hidden');
     quizCompletion.classList.remove('hidden');
