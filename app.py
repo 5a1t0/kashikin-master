@@ -19,20 +19,25 @@ def get_db_connection():
 @app.route('/')
 def index():
     conn = get_db_connection()
-    # データベースから年度とジャンルのリストを取得
-    years_db = conn.execute("SELECT DISTINCT year FROM questions ORDER BY year DESC").fetchall()
+    # データベースから年度とジャンルのリストを取得（SQL側ではソートしない）
+    years_db = conn.execute("SELECT DISTINCT year FROM questions").fetchall()
     genres_db = conn.execute("SELECT DISTINCT genre FROM questions ORDER BY genre ASC").fetchall()
     conn.close()
 
     years = [row['year'] for row in years_db]
-    # 全年度選択肢を追加
+    
+    # 🚨 アプリケーション側で年度を降順にソートする 🚨
+    # Pythonのsorted()関数を使用
+    years = sorted(years, reverse=True) 
+
+    # '全年度'選択肢をリストの先頭に追加
     years.insert(0, "全年度")
 
     genres = [row['genre'] for row in genres_db]
     
     return render_template('index.html', years=years, genres=genres)
 
-# クイズページ（変更なし）
+# クイズページ
 @app.route('/quiz')
 def quiz():
     return render_template('quiz.html')
@@ -48,10 +53,8 @@ def get_quiz():
     
     # SQLクエリの構築
     if year == "全年度":
-        # 全年度を対象とする
         questions_db = conn.execute("SELECT * FROM questions WHERE genre = ?", (genre,)).fetchall()
     else:
-        # 特定の年度とジャンルを対象とする
         questions_db = conn.execute("SELECT * FROM questions WHERE year = ? AND genre = ?", (year, genre)).fetchall()
         
     conn.close()
@@ -60,7 +63,6 @@ def get_quiz():
     if questions_db:
         for q in questions_db:
             q_dict = dict(q)
-            # 問題文と解説文の改行をHTMLの<br>タグに変換
             q_dict['question'] = q_dict['question'].replace('\n', '<br>')
             q_dict['commentary'] = q_dict['commentary'].replace('\n', '<br>')
             selected_quizzes.append(q_dict)
