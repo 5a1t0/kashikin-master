@@ -12,7 +12,11 @@ def nl2br(s):
 
 def get_db_connection():
     """SQLiteデータベースに接続する"""
-    conn = sqlite3.connect('kashikin.db')
+    import os
+    # Use absolute path to ensure the correct DB file is opened regardless of current working directory
+    base_dir = os.path.dirname(__file__)
+    db_path = os.path.join(base_dir, 'kashikin.db')
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row  # 辞書形式で結果を取得
     return conn
 
@@ -93,6 +97,12 @@ def index():
     # '全年度'選択肢をリストの先頭に追加
     years_sorted.insert(0, "全年度")
 
+    # DEBUG: print years to server console to help diagnose missing options in browser
+    try:
+        print('DEBUG years_sorted:', years_sorted)
+    except Exception:
+        pass
+
     genres = [row['genre'] for row in genres_db]
     
     return render_template('index.html', years=years_sorted, genres=genres)
@@ -101,6 +111,37 @@ def index():
 @app.route('/quiz')
 def quiz():
     return render_template('quiz.html')
+
+
+@app.route('/debug/years')
+def debug_years():
+    """Debug endpoint: return years and counts as JSON (sorted newest->oldest)."""
+    conn = get_db_connection()
+    rows = conn.execute("SELECT year, COUNT(*) as cnt FROM questions GROUP BY year").fetchall()
+    conn.close()
+
+    years = [r['year'] for r in rows]
+    counts = {r['year']: r['cnt'] for r in rows}
+    years_sorted = sorted(years, key=get_sort_key, reverse=True)
+    return jsonify({
+        'years_sorted': years_sorted,
+        'counts': counts
+    })
+
+
+@app.route('/debug/info')
+def debug_info():
+    """Return runtime info to help debug which app file is running and available routes."""
+    import os
+    # list registered routes
+    routes = []
+    for rule in app.url_map.iter_rules():
+        routes.append(str(rule))
+    return jsonify({
+        'app_file': __file__,
+        'cwd': os.getcwd(),
+        'routes': sorted(routes)
+    })
 
 # クイズデータ取得API
 @app.route('/api/quiz', methods=['POST'])
