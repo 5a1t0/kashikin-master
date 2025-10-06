@@ -123,7 +123,8 @@ function displayQuiz() {
 // 正答率を更新する関数
 function updateAccuracyRate() {
     // 回答済みの問題数を分母に使用
-    const answeredCount = currentQuizIndex; 
+    // 現在の問題が表示中かつ解答済み（quizResult が表示されている）なら +1
+    const answeredCount = currentQuizIndex + (quizResult && !quizResult.classList.contains('hidden') ? 1 : 0);
     if (answeredCount > 0) {
         const accuracy = (correctAnswers / answeredCount) * 100;
         quizAccuracyRate.textContent = `正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${answeredCount}問)`;
@@ -134,7 +135,9 @@ function updateAccuracyRate() {
 
 // プログレスバーを更新する関数
 function updateProgressBar(currentIndex, totalCount) {
-    const progress = (currentIndex / totalCount) * 100;
+    // 表示する進捗は「回答済み数 / totalCount」ベースにする
+    const answeredCount = currentIndex + (quizResult && !quizResult.classList.contains('hidden') ? 1 : 0);
+    const progress = (answeredCount / totalCount) * 100;
     progressBar.style.width = `${progress}%`;
     progressBar.textContent = `${Math.floor(progress)}%`;
 }
