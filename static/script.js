@@ -198,7 +198,9 @@ function nextQuiz() {
 
 // クイズ終了
 function finishQuiz() {
-    const accuracy = (correctAnswers / totalQuizzes) * 100;
+    // Calculate accuracy based on answered questions (currentQuizIndex is the count of answered questions)
+    const answeredCount = currentQuizIndex;
+    const accuracy = answeredCount > 0 ? (correctAnswers / answeredCount) * 100 : 0;
     
     // Hide quiz container and show completion screen
     const quizContainer = document.getElementById('quiz-container');
@@ -218,7 +220,7 @@ function finishQuiz() {
     }
 
     accuracyRate.innerHTML = `
-        <strong>正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${totalQuizzes}問)</strong><br>
+        <strong>正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${answeredCount}問)</strong><br>
         <p style="font-size: 1.5rem; margin-top: 10px;">${message}</p>
     `;
 
