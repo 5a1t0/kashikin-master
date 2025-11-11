@@ -114,7 +114,7 @@ button#start-button:hover {
 
 /* 問題文 (フォントサイズ調整と左揃え) */
 #quiz-question {
-    font-size: 1em; /* Default question font size */
+    font-size: 1.2rem; /* Slightly smaller font for the question */
     margin-bottom: 30px;
     font-weight: bold;
     min-height: 100px;
@@ -155,7 +155,7 @@ button#start-button:hover {
 
 .quiz-button {
     padding: 15px 40px;
-    font-size: 0.9em; /* Slightly smaller than the question font */
+    font-size: 1rem; /* Options slightly smaller than the question */
     color: #000; /* 文字色を黒に */
     background-color: #ecf0f1;
     border: 1px solid #bdc3c7;
@@ -270,43 +270,4 @@ button#start-button:hover {
         width: 100%;
         margin-top: 10px;
     }
-}
-
-/* --- 5. 正解・不正解の強調表示 --- */
-.correct-answer {
-    background-color: #4CAF50; /* Green for correct */
-    color: white;
-}
-
-.selected-answer {
-    background-color: #FFC107; /* Yellow for selected */
-    color: black;
-}
-
-.incorrect-answer {
-    background-color: #F44336; /* Red for incorrect */
-    color: white;
-}
-
-.result-message {
-    text-align: center;
-    font-size: 1.2em;
-    margin-top: 20px;
-}
-
-.correct-box {
-    border: 2px solid #4CAF50;
-    padding: 10px;
-    background-color: #E8F5E9;
-}
-
-.incorrect-box {
-    border: 2px solid #F44336;
-    padding: 10px;
-    background-color: #FFEBEE;
-}
-
-.explanation-box {
-    margin-top: 10px;
-    font-size: 0.9em;
 }
