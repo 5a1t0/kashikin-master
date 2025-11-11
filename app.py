@@ -149,31 +149,35 @@ def get_quiz():
     data = request.json
     year = data.get('year')
     genre = data.get('genre')
+    shuffle = data.get('shuffle', False)  # New parameter for shuffle
 
     conn = get_db_connection()
-    
+
     # SQLクエリの構築
     if year == "全年度":
         questions_db = conn.execute("SELECT * FROM questions WHERE genre = ?", (genre,)).fetchall()
     else:
         questions_db = conn.execute("SELECT * FROM questions WHERE year = ? AND genre = ?", (year, genre)).fetchall()
-        
+
     conn.close()
 
     selected_quizzes = []
     if questions_db:
         for q in questions_db:
             q_dict = dict(q)
-            # XSS 対策: サーバ側でまず HTML エスケープし、その後改行のみ <br> に変換して安全にレンダリング
+            # Add 'year' to the quiz data
+            q_dict['year'] = q['year']
+            # Escape HTML and convert newlines to <br>
             safe_question = html.escape(q_dict.get('question', ''))
             safe_commentary = html.escape(q_dict.get('commentary', ''))
             q_dict['question'] = safe_question.replace('\n', '<br>')
             q_dict['commentary'] = safe_commentary.replace('\n', '<br>')
             selected_quizzes.append(q_dict)
 
-    # ランダム出題（シャッフル）
-    random.shuffle(selected_quizzes)
-    
+    # Shuffle quizzes if the shuffle option is enabled
+    if shuffle:
+        random.shuffle(selected_quizzes)
+
     if not selected_quizzes:
         return jsonify({"error": "指定された条件に一致する問題が見つかりません。"})
 

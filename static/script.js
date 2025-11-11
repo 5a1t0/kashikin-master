@@ -94,27 +94,28 @@ if (window.location.pathname === '/quiz') {
 function displayQuiz() {
     if (currentQuizIndex < totalQuizzes) {
         const quiz = quizzes[currentQuizIndex];
-        
-        // 問題文と進捗バーの更新
+
+        // Update accuracy rate and progress bar
         updateAccuracyRate();
         updateProgressBar(currentQuizIndex, totalQuizzes);
-        
-        quizQuestionNumber.textContent = `第${currentQuizIndex + 1}問 / ${totalQuizzes}問`;
+
+        // Display question number and year
+        quizQuestionNumber.textContent = `第${currentQuizIndex + 1}問 / ${totalQuizzes}問 (${quiz.year})`;
         quizQuestion.innerHTML = quiz.question;
-        
+
         quizButtons.innerHTML = '';
         const options = ['①', '②', '③', '④'];
         options.forEach(option => {
             const button = document.createElement('button');
             button.textContent = option;
             button.classList.add('quiz-button');
-            // クリック時にボタン自体を渡す
+            // Pass the button itself on click
             button.addEventListener('click', () => checkAnswer(option, button));
             quizButtons.appendChild(button);
         });
 
         quizResult.classList.add('hidden');
-        quizResult.classList.remove('correct-box', 'incorrect-box'); // 前回の枠線をリセット
+        quizResult.classList.remove('correct-box', 'incorrect-box'); // Reset previous result styles
     } else {
         finishQuiz();
     }
@@ -122,9 +123,8 @@ function displayQuiz() {
 
 // 正答率を更新する関数
 function updateAccuracyRate() {
-    // 回答済みの問題数を分母に使用
-    // 現在の問題が表示中かつ解答済み（quizResult が表示されている）なら +1
-    const answeredCount = currentQuizIndex + (quizResult && !quizResult.classList.contains('hidden') ? 1 : 0);
+    // Exclude the current question from the accuracy calculation
+    const answeredCount = currentQuizIndex; // Only count answered questions
     if (answeredCount > 0) {
         const accuracy = (correctAnswers / answeredCount) * 100;
         quizAccuracyRate.textContent = `正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${answeredCount}問)`;
