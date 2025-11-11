@@ -198,8 +198,8 @@ function nextQuiz() {
 
 // クイズ終了
 function finishQuiz() {
-    // Calculate accuracy based on answered questions (currentQuizIndex is the count of answered questions)
-    const answeredCount = currentQuizIndex;
+    // Calculate accuracy including the current question (currentQuizIndex + 1)
+    const answeredCount = currentQuizIndex + 1;
     const accuracy = answeredCount > 0 ? (correctAnswers / answeredCount) * 100 : 0;
     
     // Hide quiz container and show completion screen
