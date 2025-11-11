@@ -220,5 +220,11 @@ function finishQuiz() {
         <p>${message}</p>
     `;
 
+    // Clear session storage to reset the quiz state
     sessionStorage.clear();
+
+    // Ensure the end button redirects to the home page
+    backToHomeButton.addEventListener('click', () => {
+        window.location.href = '/';
+    });
 }
