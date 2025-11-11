@@ -199,8 +199,11 @@ function nextQuiz() {
 // クイズ終了
 function finishQuiz() {
     const accuracy = (correctAnswers / totalQuizzes) * 100;
+    
+    // Hide quiz container and show completion screen
+    const quizContainer = document.getElementById('quiz-container');
     quizContainer.classList.add('hidden');
-    quizResult.classList.remove('hidden');
+    quizCompletion.classList.remove('hidden');
 
     // Display a message based on the accuracy rate
     let message = '';
@@ -214,17 +217,11 @@ function finishQuiz() {
         message = '😅 もう少し頑張りましょう！次回に期待！';
     }
 
-    quizResult.innerHTML = `
-        <h2>クイズ終了</h2>
-        <p>正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${totalQuizzes}問)</p>
-        <p>${message}</p>
+    accuracyRate.innerHTML = `
+        <strong>正答率: ${accuracy.toFixed(1)}% (${correctAnswers}/${totalQuizzes}問)</strong><br>
+        <p style="font-size: 1.5rem; margin-top: 10px;">${message}</p>
     `;
 
     // Clear session storage to reset the quiz state
     sessionStorage.clear();
-
-    // Ensure the end button redirects to the home page
-    backToHomeButton.addEventListener('click', () => {
-        window.location.href = '/';
-    });
 }
